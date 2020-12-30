@@ -17,17 +17,18 @@ export class Dot {
   ) {
     this.x = x;
     this.y = y;
-    this.targetRadius = radius;
-    this.radius = 0;
-    this.radiusV = 0;
     this.pixelSize = pixelSize;
     this.pixelSizeHalf = pixelSize / 2;
     this.red = red;
     this.green = green;
     this.blue = blue;
+
+    this.targetRadius = radius;
+    this.radius = 0;
+    this.radiusV = 0;
   }
 
-  animate = (ctx: any): void => {
+  animate = (ctx: CanvasRenderingContext2D): void => {
     ctx.beginPath();
     ctx.fillStyle = "#000";
     ctx.fillRect(
@@ -48,7 +49,7 @@ export class Dot {
     ctx.fill();
   };
 
-  reset = () => {
+  reset = (): void => {
     this.radius = 0;
     this.radiusV = 0;
   };
