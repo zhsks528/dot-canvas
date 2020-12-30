@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
-import paint from "paint.png";
+import paint from "resources/images/paint.png";
 import { Ripple } from "components/Ripple/Ripple";
 import { Dot } from "components/Dot/Dot";
 import { collide } from "utils";
