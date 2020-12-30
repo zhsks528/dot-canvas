@@ -2,12 +2,18 @@ import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
 import paint from "paint.png";
 import { Ripple } from "components/Ripple/Ripple";
+import { Dot } from "components/Dot/Dot";
+import { collide } from "utils";
 
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D | null;
+let tmpCanvas: HTMLCanvasElement;
+let tmpCtx: CanvasRenderingContext2D | null;
+let dots: Array<any> = [];
 
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const tmpCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const pixelRatio: number = window.devicePixelRatio > 1 ? 2 : 1;
 
@@ -25,10 +31,16 @@ const App = () => {
 
   const ripple = new Ripple();
 
+  const radius = 8;
+  const pixelSize = 20;
+
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && tmpCanvasRef.current) {
       canvas = canvasRef.current;
       ctx = canvasRef.current.getContext("2d");
+
+      tmpCanvas = tmpCanvasRef.current;
+      tmpCtx = tmpCanvasRef.current.getContext("2d");
 
       window.addEventListener("resize", resize, false);
 
@@ -55,6 +67,9 @@ const App = () => {
 
     // 캔버스 확대 요소
     ctx!.scale(pixelRatio, pixelRatio);
+
+    tmpCanvas.width = stageWidth;
+    tmpCanvas.height = stageHeight;
 
     ripple.resize(stageWidth, stageHeight);
 
@@ -94,12 +109,65 @@ const App = () => {
       imgPos.width,
       imgPos.height
     );
+
+    tmpCtx!.drawImage(
+      image,
+      0,
+      0,
+      image.width,
+      image.height,
+      imgPos.x,
+      imgPos.y,
+      imgPos.width,
+      imgPos.height
+    );
+
+    drawDots();
+  };
+
+  const drawDots = (): void => {
+    dots = [];
+
+    const stageWidth = document.body.clientWidth;
+    const stageHeight = document.body.clientHeight;
+
+    const imgData = tmpCtx!.getImageData(0, 0, stageWidth, stageHeight);
+
+    const columns = Math.ceil(stageWidth / pixelSize);
+    const rows = Math.ceil(stageHeight / pixelSize);
+
+    for (let i = 0; i < rows; i++) {
+      const y = (i + 0.5) * pixelSize;
+      const pixelY = Math.max(Math.min(y, stageHeight), 0);
+
+      for (let j = 0; j < columns; j++) {
+        const x = (j + 0.5) * pixelSize;
+        const pixelX = Math.max(Math.min(x, stageWidth), 0);
+        const pixelIndex = (pixelX + pixelY * stageWidth) * 4;
+
+        const red = imgData.data[pixelIndex + 0];
+        const green = imgData.data[pixelIndex + 1];
+        const blue = imgData.data[pixelIndex + 2];
+
+        const dot = new Dot(x, y, radius, pixelSize, red, green, blue);
+
+        dots.push(dot);
+      }
+    }
   };
 
   const animate = (): void => {
     window.requestAnimationFrame(animate);
 
     ripple.animate(ctx);
+
+    for (let i = 0; i < dots.length; i++) {
+      const dot = dots[i];
+
+      if (collide(dot.x, dot.y, ripple.x, ripple.y, ripple.radius)) {
+        dot.animate(ctx);
+      }
+    }
   };
 
   const onclick = (event: MouseEvent): void => {
@@ -107,6 +175,11 @@ const App = () => {
     const stageHeight = document.body.clientHeight;
 
     ctx!.clearRect(0, 0, stageWidth, stageHeight);
+
+    for (let i = 0; i < dots.length; i++) {
+      dots[i].reset();
+    }
+
     ctx!.drawImage(
       image,
       0,
@@ -118,11 +191,13 @@ const App = () => {
       imgPos.width,
       imgPos.height
     );
+
     ripple.start(event.offsetX, event.offsetY);
   };
   return (
     <>
       <canvas ref={canvasRef}></canvas>
+      <canvas ref={tmpCanvasRef}></canvas>
     </>
   );
 };
