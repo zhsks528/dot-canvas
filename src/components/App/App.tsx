@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
 import paint from "paint.png";
+import { Ripple } from "components/Ripple/Ripple";
 
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D | null;
@@ -22,6 +23,8 @@ const App = () => {
   const image = new Image();
   image.src = paint;
 
+  const ripple = new Ripple();
+
   useEffect(() => {
     if (canvasRef.current) {
       canvas = canvasRef.current;
@@ -35,6 +38,10 @@ const App = () => {
         setIsLoaded(true);
         drawImage();
       };
+
+      window.requestAnimationFrame(animate);
+
+      canvas.addEventListener("click", onclick, false);
     }
   });
 
@@ -48,6 +55,8 @@ const App = () => {
 
     // 캔버스 확대 요소
     ctx!.scale(pixelRatio, pixelRatio);
+
+    ripple.resize(stageWidth, stageHeight);
 
     if (isLoaded) {
       drawImage();
@@ -85,6 +94,31 @@ const App = () => {
       imgPos.width,
       imgPos.height
     );
+  };
+
+  const animate = (): void => {
+    window.requestAnimationFrame(animate);
+
+    ripple.animate(ctx);
+  };
+
+  const onclick = (event: MouseEvent): void => {
+    const stageWidth = document.body.clientWidth;
+    const stageHeight = document.body.clientHeight;
+
+    ctx!.clearRect(0, 0, stageWidth, stageHeight);
+    ctx!.drawImage(
+      image,
+      0,
+      0,
+      image.width,
+      image.height,
+      imgPos.x,
+      imgPos.y,
+      imgPos.width,
+      imgPos.height
+    );
+    ripple.start(event.offsetX, event.offsetY);
   };
   return (
     <>
