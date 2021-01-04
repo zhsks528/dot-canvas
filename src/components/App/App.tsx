@@ -1,9 +1,15 @@
 import React, { useRef, useEffect, useState } from "react";
-import "./App.css";
 import paint from "resources/images/paint.png";
 import { Ripple } from "components/Ripple/Ripple";
 import { Dot } from "components/Dot/Dot";
 import { collide } from "utils";
+import styled from "styled-components";
+import GlobalStyle from "components/globalStyle";
+
+const Canvas = styled.canvas`
+  width: 100%;
+  height: 100%;
+`;
 
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D | null;
@@ -201,8 +207,9 @@ const App = () => {
   };
   return (
     <>
-      <canvas ref={canvasRef}></canvas>
-      <canvas ref={tmpCanvasRef}></canvas>
+      <GlobalStyle />
+      <Canvas ref={canvasRef}></Canvas>
+      <Canvas ref={tmpCanvasRef}></Canvas>
     </>
   );
 };
