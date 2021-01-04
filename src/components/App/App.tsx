@@ -11,15 +11,23 @@ let tmpCanvas: HTMLCanvasElement;
 let tmpCtx: CanvasRenderingContext2D | null;
 let dots: Array<any> = [];
 
+interface imgPosType {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tmpCanvasRef = useRef<HTMLCanvasElement>(null);
-
   const pixelRatio: number = window.devicePixelRatio > 1 ? 2 : 1;
-
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-  const imgPos = {
+  const radius: number = 8;
+  const pixelSize: number = 20;
+
+  const imgPos: imgPosType = {
     x: 0,
     y: 0,
     width: 0,
@@ -30,9 +38,6 @@ const App = () => {
   image.src = paint;
 
   const ripple = new Ripple();
-
-  const radius = 8;
-  const pixelSize = 20;
 
   useEffect(() => {
     if (canvasRef.current && tmpCanvasRef.current) {
@@ -58,8 +63,8 @@ const App = () => {
   });
 
   const resize = (): void => {
-    const stageWidth = document.body.clientWidth;
-    const stageHeight = document.body.clientHeight;
+    const stageWidth: number = document.body.clientWidth;
+    const stageHeight: number = document.body.clientHeight;
 
     // 캔버스 크기 설정 ( 웹브라우저의 크기에 따른 )
     canvas.width = stageWidth * pixelRatio;
@@ -79,11 +84,11 @@ const App = () => {
   };
 
   const drawImage = (): void => {
-    const stageWidth = document.body.clientWidth;
-    const stageHeight = document.body.clientHeight;
+    const stageWidth: number = document.body.clientWidth;
+    const stageHeight: number = document.body.clientHeight;
 
-    const stageRatio = stageWidth / stageHeight;
-    const imgRatio = image.width / image.height;
+    const stageRatio: number = stageWidth / stageHeight;
+    const imgRatio: number = image.width / image.height;
 
     imgPos.width = stageWidth;
     imgPos.height = stageHeight;
@@ -128,8 +133,8 @@ const App = () => {
   const drawDots = (): void => {
     dots = [];
 
-    const stageWidth = document.body.clientWidth;
-    const stageHeight = document.body.clientHeight;
+    const stageWidth: number = document.body.clientWidth;
+    const stageHeight: number = document.body.clientHeight;
 
     const imgData = tmpCtx!.getImageData(0, 0, stageWidth, stageHeight);
 
@@ -171,8 +176,8 @@ const App = () => {
   };
 
   const onclick = (event: MouseEvent): void => {
-    const stageWidth = document.body.clientWidth;
-    const stageHeight = document.body.clientHeight;
+    const stageWidth: number = document.body.clientWidth;
+    const stageHeight: number = document.body.clientHeight;
 
     ctx!.clearRect(0, 0, stageWidth, stageHeight);
 
