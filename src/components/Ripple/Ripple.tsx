@@ -40,12 +40,12 @@ export class Ripple {
     ctx.fill();
   };
 
-  getMax(x: number, y: number): number {
+  getMax = (x: number, y: number): number => {
     const c1 = distance(0, 0, x, y);
     const c2 = distance(this.stageWidth, 0, this.x, this.y);
     const c3 = distance(0, this.stageHeight, this.x, this.y);
     const c4 = distance(this.stageWidth, this.stageHeight, this.x, this.y);
 
     return Math.max(c1, c2, c3, c4);
-  }
+  };
 }

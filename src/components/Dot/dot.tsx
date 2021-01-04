@@ -1,10 +1,10 @@
-const PI2 = Math.PI * 2;
-const BOUNCE = 0.82;
+const PI2: number = Math.PI * 2;
+const BOUNCE: number = 0.82;
 
 export class Dot {
-  public targetRadius: number;
-  public radiusV: number;
-  public pixelSizeHalf: number;
+  targetRadius: number;
+  radiusV: number;
+  pixelSizeHalf: number;
 
   constructor(
     public x: number,
@@ -38,7 +38,7 @@ export class Dot {
       this.pixelSize
     );
 
-    const accel = (this.targetRadius - this.radius) / 2;
+    const accel: number = (this.targetRadius - this.radius) / 2;
     this.radiusV += accel;
     this.radiusV *= BOUNCE;
     this.radius += this.radiusV;

@@ -17,7 +17,7 @@ const App = () => {
 
   const pixelRatio: number = window.devicePixelRatio > 1 ? 2 : 1;
 
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const imgPos = {
     x: 0,
@@ -57,7 +57,7 @@ const App = () => {
     }
   });
 
-  const resize = () => {
+  const resize = (): void => {
     const stageWidth = document.body.clientWidth;
     const stageHeight = document.body.clientHeight;
 
