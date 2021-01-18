@@ -45,3 +45,11 @@ npm run start
 
 **YouTube** : [Interactive Developer](https://www.youtube.com/channel/UCdeWxKJuvtUG2xyN6pOJEvA)
 
+## Study
+
+1. React에서 <canvas>의 기본 사용법을 배울 수 있는 좋은 계기.
+  - DOM을 직접 조작할 때에는 useRef를 적극적으로 활용해야함.
+2. 원본 이미지에서 색상을 추출하는 방법을 익힘.
+3. TS를 적용하니 확실히 오류를 빨리 찾을 수 있었음 => TS의 필요성 인지
+4. 물리적인 지식(가속도)을 이용하여 상호작용하는  
+4. 
