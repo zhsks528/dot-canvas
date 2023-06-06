@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import paint from "resources/images/paint.png";
 import { Ripple } from "components/ripple";
 import { Dot } from "components/dot";
@@ -40,33 +40,12 @@ const App = () => {
     height: 0,
   };
 
-  const image = new Image();
+  const image = useMemo(() => new Image(), []);
   image.src = paint;
 
-  const ripple = new Ripple();
+  const ripple = useMemo(() => new Ripple(), []);
 
-  function resize(): void {
-    const stageWidth: number = document.body.clientWidth;
-    const stageHeight: number = document.body.clientHeight;
-
-    // 캔버스 크기 설정 ( 웹브라우저의 크기에 따른 )
-    canvas.width = stageWidth * pixelRatio;
-    canvas.height = stageHeight * pixelRatio;
-
-    // 캔버스 확대 요소
-    ctx!.scale(pixelRatio, pixelRatio);
-
-    tmpCanvas.width = stageWidth;
-    tmpCanvas.height = stageHeight;
-
-    ripple.resize(stageWidth, stageHeight);
-
-    if (isLoaded) {
-      drawImage();
-    }
-  }
-
-  function drawImage(): void {
+  const drawImage = useCallback(() => {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
 
@@ -111,7 +90,7 @@ const App = () => {
     );
 
     drawDots();
-  }
+  }, [image, imgPos]);
 
   function drawDots(): void {
     dots = [];
@@ -144,7 +123,7 @@ const App = () => {
     }
   }
 
-  function animate(): void {
+  const animate = useCallback(() => {
     window.requestAnimationFrame(animate);
 
     ripple.animate(ctx);
@@ -156,32 +135,56 @@ const App = () => {
         dot.animate(ctx);
       }
     }
-  }
+  }, [ripple]);
 
-  function onClick(event: MouseEvent): void {
+  const onClick = useCallback(
+    (event: MouseEvent): void => {
+      const stageWidth: number = document.body.clientWidth;
+      const stageHeight: number = document.body.clientHeight;
+
+      ctx!.clearRect(0, 0, stageWidth, stageHeight);
+
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].reset();
+      }
+
+      ctx!.drawImage(
+        image,
+        0,
+        0,
+        image.width,
+        image.height,
+        imgPos.x,
+        imgPos.y,
+        imgPos.width,
+        imgPos.height
+      );
+
+      ripple.start(event.offsetX, event.offsetY);
+    },
+    [image, imgPos, ripple]
+  );
+
+  const resize = useCallback(() => {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
 
-    ctx!.clearRect(0, 0, stageWidth, stageHeight);
+    // 캔버스 크기 설정 ( 웹브라우저의 크기에 따른 )
+    canvas.width = stageWidth * pixelRatio;
+    canvas.height = stageHeight * pixelRatio;
 
-    for (let i = 0; i < dots.length; i++) {
-      dots[i].reset();
+    // 캔버스 확대 요소
+    ctx!.scale(pixelRatio, pixelRatio);
+
+    tmpCanvas.width = stageWidth;
+    tmpCanvas.height = stageHeight;
+
+    ripple.resize(stageWidth, stageHeight);
+
+    if (isLoaded) {
+      drawImage();
     }
-
-    ctx!.drawImage(
-      image,
-      0,
-      0,
-      image.width,
-      image.height,
-      imgPos.x,
-      imgPos.y,
-      imgPos.width,
-      imgPos.height
-    );
-
-    ripple.start(event.offsetX, event.offsetY);
-  }
+  }, [isLoaded, pixelRatio, ripple, drawImage]);
 
   useEffect(() => {
     if (canvasRef.current && tmpCanvasRef.current) {
@@ -190,8 +193,6 @@ const App = () => {
 
       tmpCanvas = tmpCanvasRef.current;
       tmpCtx = tmpCanvasRef.current.getContext("2d");
-
-      window.addEventListener("resize", resize, false);
 
       resize();
 
@@ -202,9 +203,15 @@ const App = () => {
 
       window.requestAnimationFrame(animate);
 
+      window.addEventListener("resize", resize, false);
       canvas.addEventListener("click", onClick, false);
+
+      return () => {
+        window.removeEventListener("resize", resize, false);
+        canvas.removeEventListener("click", onClick, false);
+      };
     }
-  });
+  }, [image, animate, drawImage, onClick, resize]);
 
   return (
     <>
