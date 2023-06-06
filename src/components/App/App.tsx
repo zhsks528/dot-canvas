@@ -48,7 +48,36 @@ const App = () => {
 
   const ripple = useMemo(() => new Ripple(), []);
 
+  // 이미지를 캔버스에 그리는 함수
   const drawImage = useCallback(() => {
+    function initializeImagePosition({
+      image,
+      position,
+    }: {
+      image: HTMLImageElement;
+      position: imgPosType;
+    }) {
+      const { clientWidth, clientHeight } = getDocumentSize();
+
+      const documentRatio: number = clientWidth / clientHeight;
+      const imageRatio: number = image.width / image.height;
+
+      position.width = clientWidth;
+      position.height = clientHeight;
+
+      if (imageRatio < documentRatio) {
+        position.width = Math.round(
+          image.width * (clientHeight / image.height)
+        );
+        position.x = Math.round((clientWidth - position.width) / 2);
+      } else {
+        position.height = Math.round(
+          image.height * (clientWidth / image.width)
+        );
+        position.y = Math.round((clientHeight - position.height) / 2);
+      }
+    }
+
     initializeImagePosition({
       image,
       position: imgPos,
@@ -82,6 +111,7 @@ const App = () => {
     drawDots();
   }, [image, imgPos]);
 
+  // 점을 캔버스에 그리는 함수
   const drawDots = () => {
     dots = [];
 
@@ -89,14 +119,14 @@ const App = () => {
 
     const imgData = tmpCtx!.getImageData(0, 0, clientWidth, clientHeight);
 
-    const columns = Math.ceil(clientWidth / PIXEL_SIZE);
-    const rows = Math.ceil(clientHeight / PIXEL_SIZE);
+    const rows = Math.ceil(clientWidth / PIXEL_SIZE);
+    const columns = Math.ceil(clientHeight / PIXEL_SIZE);
 
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < columns; i++) {
       const y = (i + 0.5) * PIXEL_SIZE;
       const pixelY = Math.max(Math.min(y, clientHeight), 0);
 
-      for (let j = 0; j < columns; j++) {
+      for (let j = 0; j < rows; j++) {
         const x = (j + 0.5) * PIXEL_SIZE;
         const pixelX = Math.max(Math.min(x, clientWidth), 0);
         const pixelIndex = (pixelX + pixelY * clientWidth) * 4;
@@ -112,6 +142,7 @@ const App = () => {
     }
   };
 
+  // 물결 효과 실행 함수
   const onClick = useCallback(
     (event: MouseEvent): void => {
       const { clientWidth, clientHeight } = getDocumentSize();
@@ -216,28 +247,4 @@ function getDocumentSize(): { clientWidth: number; clientHeight: number } {
   const { clientWidth, clientHeight } = document.body;
 
   return { clientWidth, clientHeight };
-}
-
-function initializeImagePosition({
-  image,
-  position,
-}: {
-  image: HTMLImageElement;
-  position: imgPosType;
-}) {
-  const { clientWidth, clientHeight } = getDocumentSize();
-
-  const documentRatio: number = clientWidth / clientHeight;
-  const imageRatio: number = image.width / image.height;
-
-  position.width = clientWidth;
-  position.height = clientHeight;
-
-  if (imageRatio < documentRatio) {
-    position.width = Math.round(image.width * (clientHeight / image.height));
-    position.x = Math.round((clientWidth - position.width) / 2);
-  } else {
-    position.height = Math.round(image.height * (clientWidth / image.width));
-    position.y = Math.round((clientHeight - position.height) / 2);
-  }
 }
