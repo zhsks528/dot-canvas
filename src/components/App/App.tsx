@@ -24,14 +24,14 @@ interface imgPosType {
   height: number;
 }
 
+const DOT_RADIUS = 8;
+const PIXEL_SIZE = 20;
+
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tmpCanvasRef = useRef<HTMLCanvasElement>(null);
   const pixelRatio: number = window.devicePixelRatio > 1 ? 2 : 1;
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-
-  const radius: number = 8;
-  const pixelSize: number = 20;
 
   const imgPos: imgPosType = {
     x: 0,
@@ -100,15 +100,15 @@ const App = () => {
 
     const imgData = tmpCtx!.getImageData(0, 0, stageWidth, stageHeight);
 
-    const columns = Math.ceil(stageWidth / pixelSize);
-    const rows = Math.ceil(stageHeight / pixelSize);
+    const columns = Math.ceil(stageWidth / PIXEL_SIZE);
+    const rows = Math.ceil(stageHeight / PIXEL_SIZE);
 
     for (let i = 0; i < rows; i++) {
-      const y = (i + 0.5) * pixelSize;
+      const y = (i + 0.5) * PIXEL_SIZE;
       const pixelY = Math.max(Math.min(y, stageHeight), 0);
 
       for (let j = 0; j < columns; j++) {
-        const x = (j + 0.5) * pixelSize;
+        const x = (j + 0.5) * PIXEL_SIZE;
         const pixelX = Math.max(Math.min(x, stageWidth), 0);
         const pixelIndex = (pixelX + pixelY * stageWidth) * 4;
 
@@ -116,7 +116,7 @@ const App = () => {
         const green = imgData.data[pixelIndex + 1];
         const blue = imgData.data[pixelIndex + 2];
 
-        const dot = new Dot(x, y, radius, pixelSize, red, green, blue);
+        const dot = new Dot(x, y, DOT_RADIUS, PIXEL_SIZE, red, green, blue);
 
         dots.push(dot);
       }
@@ -212,6 +212,9 @@ const App = () => {
       };
     }
   }, [image, animate, drawImage, onClick, resize]);
+
+  console.log("ctx", ctx);
+  console.log("imgPos", imgPos);
 
   return (
     <>
