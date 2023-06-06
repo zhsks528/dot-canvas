@@ -33,12 +33,15 @@ const App = () => {
   const pixelRatio: number = window.devicePixelRatio > 1 ? 2 : 1;
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-  const imgPos: imgPosType = {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  };
+  const imgPos: imgPosType = useMemo(
+    () => ({
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    }),
+    []
+  );
 
   const image = useMemo(() => new Image(), []);
   image.src = paint;
@@ -46,24 +49,25 @@ const App = () => {
   const ripple = useMemo(() => new Ripple(), []);
 
   const drawImage = useCallback(() => {
-    const stageWidth: number = document.body.clientWidth;
-    const stageHeight: number = document.body.clientHeight;
+    const { clientWidth, clientHeight } = getDocumentSize();
 
-    const stageRatio: number = stageWidth / stageHeight;
+    const stageRatio: number = clientWidth / clientHeight;
     const imgRatio: number = image.width / image.height;
 
-    imgPos.width = stageWidth;
-    imgPos.height = stageHeight;
+    imgPos.width = clientWidth;
+    imgPos.height = clientHeight;
 
     if (imgRatio < stageRatio) {
-      imgPos.width = Math.round(image.width * (stageHeight / image.height));
+      imgPos.width = Math.round(image.width * (clientHeight / image.height));
 
-      imgPos.x = Math.round((stageWidth - imgPos.width) / 2);
+      imgPos.x = Math.round((clientWidth - imgPos.width) / 2);
     } else {
-      imgPos.height = Math.round(image.height * (stageWidth / image.width));
+      imgPos.height = Math.round(image.height * (clientWidth / image.width));
 
-      imgPos.y = Math.round((stageHeight - imgPos.height) / 2);
+      imgPos.y = Math.round((clientHeight - imgPos.height) / 2);
     }
+
+    console.log("imgPos", imgPos);
 
     ctx!.drawImage(
       image,
@@ -95,22 +99,21 @@ const App = () => {
   const drawDots = () => {
     dots = [];
 
-    const stageWidth: number = document.body.clientWidth;
-    const stageHeight: number = document.body.clientHeight;
+    const { clientWidth, clientHeight } = getDocumentSize();
 
-    const imgData = tmpCtx!.getImageData(0, 0, stageWidth, stageHeight);
+    const imgData = tmpCtx!.getImageData(0, 0, clientWidth, clientHeight);
 
-    const columns = Math.ceil(stageWidth / PIXEL_SIZE);
-    const rows = Math.ceil(stageHeight / PIXEL_SIZE);
+    const columns = Math.ceil(clientWidth / PIXEL_SIZE);
+    const rows = Math.ceil(clientHeight / PIXEL_SIZE);
 
     for (let i = 0; i < rows; i++) {
       const y = (i + 0.5) * PIXEL_SIZE;
-      const pixelY = Math.max(Math.min(y, stageHeight), 0);
+      const pixelY = Math.max(Math.min(y, clientHeight), 0);
 
       for (let j = 0; j < columns; j++) {
         const x = (j + 0.5) * PIXEL_SIZE;
-        const pixelX = Math.max(Math.min(x, stageWidth), 0);
-        const pixelIndex = (pixelX + pixelY * stageWidth) * 4;
+        const pixelX = Math.max(Math.min(x, clientWidth), 0);
+        const pixelIndex = (pixelX + pixelY * clientWidth) * 4;
 
         const red = imgData.data[pixelIndex + 0];
         const green = imgData.data[pixelIndex + 1];
@@ -125,10 +128,9 @@ const App = () => {
 
   const onClick = useCallback(
     (event: MouseEvent): void => {
-      const stageWidth: number = document.body.clientWidth;
-      const stageHeight: number = document.body.clientHeight;
+      const { clientWidth, clientHeight } = getDocumentSize();
 
-      ctx!.clearRect(0, 0, stageWidth, stageHeight);
+      ctx!.clearRect(0, 0, clientWidth, clientHeight);
 
       for (let i = 0; i < dots.length; i++) {
         dots[i].reset();
@@ -152,20 +154,19 @@ const App = () => {
   );
 
   const resize = useCallback(() => {
-    const stageWidth: number = document.body.clientWidth;
-    const stageHeight: number = document.body.clientHeight;
+    const { clientWidth, clientHeight } = getDocumentSize();
 
     // 캔버스 크기 설정 ( 웹브라우저의 크기에 따른 )
-    canvas.width = stageWidth * pixelRatio;
-    canvas.height = stageHeight * pixelRatio;
+    canvas.width = clientWidth * pixelRatio;
+    canvas.height = clientHeight * pixelRatio;
 
     // 캔버스 확대 요소
     ctx!.scale(pixelRatio, pixelRatio);
 
-    tmpCanvas.width = stageWidth;
-    tmpCanvas.height = stageHeight;
+    tmpCanvas.width = clientWidth;
+    tmpCanvas.height = clientHeight;
 
-    ripple.resize(stageWidth, stageHeight);
+    ripple.resize(clientWidth, clientHeight);
 
     if (isLoaded) {
       drawImage();
@@ -223,3 +224,9 @@ const App = () => {
 };
 
 export default App;
+
+function getDocumentSize(): { clientWidth: number; clientHeight: number } {
+  const { clientWidth, clientHeight } = document.body;
+
+  return { clientWidth, clientHeight };
+}
