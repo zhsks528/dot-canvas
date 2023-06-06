@@ -49,26 +49,12 @@ const App = () => {
   const ripple = useMemo(() => new Ripple(), []);
 
   const drawImage = useCallback(() => {
-    const { clientWidth, clientHeight } = getDocumentSize();
+    initializeImagePosition({
+      image,
+      position: imgPos,
+    });
 
-    const stageRatio: number = clientWidth / clientHeight;
-    const imgRatio: number = image.width / image.height;
-
-    imgPos.width = clientWidth;
-    imgPos.height = clientHeight;
-
-    if (imgRatio < stageRatio) {
-      imgPos.width = Math.round(image.width * (clientHeight / image.height));
-
-      imgPos.x = Math.round((clientWidth - imgPos.width) / 2);
-    } else {
-      imgPos.height = Math.round(image.height * (clientWidth / image.width));
-
-      imgPos.y = Math.round((clientHeight - imgPos.height) / 2);
-    }
-
-    console.log("imgPos", imgPos);
-
+    // 이미지 비트맵에서 (0,0)을 중심으로 imagePosition에 정의한 크기의 영역을 캔버스에 그리는 함수
     ctx!.drawImage(
       image,
       0,
@@ -217,6 +203,7 @@ const App = () => {
   return (
     <>
       <GlobalStyle />
+      {/* 고정된 크기의 드로잉 영역을 생성하며, 그 영역은 보여질 컨텐츠를 생성하고 다루게될 두가지 이상의 렌더링 컨텍스트를 노출시킨다. (2D, 3D) */}
       <Canvas ref={canvasRef}></Canvas>
       <Canvas ref={tmpCanvasRef}></Canvas>
     </>
@@ -229,4 +216,28 @@ function getDocumentSize(): { clientWidth: number; clientHeight: number } {
   const { clientWidth, clientHeight } = document.body;
 
   return { clientWidth, clientHeight };
+}
+
+function initializeImagePosition({
+  image,
+  position,
+}: {
+  image: HTMLImageElement;
+  position: imgPosType;
+}) {
+  const { clientWidth, clientHeight } = getDocumentSize();
+
+  const documentRatio: number = clientWidth / clientHeight;
+  const imageRatio: number = image.width / image.height;
+
+  position.width = clientWidth;
+  position.height = clientHeight;
+
+  if (imageRatio < documentRatio) {
+    position.width = Math.round(image.width * (clientHeight / image.height));
+    position.x = Math.round((clientWidth - position.width) / 2);
+  } else {
+    position.height = Math.round(image.height * (clientWidth / image.width));
+    position.y = Math.round((clientHeight - position.height) / 2);
+  }
 }
