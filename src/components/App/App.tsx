@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import paint from "resources/images/paint.png";
 import { Ripple } from "components/Ripple/Ripple";
-import { Dot } from "components/Dot/Dot";
+import { Dot } from "components/Dot/dot";
 import { collide } from "utils";
 import styled from "styled-components";
 import GlobalStyle from "components/globalStyle";
@@ -64,11 +64,11 @@ const App = () => {
 
       window.requestAnimationFrame(animate);
 
-      canvas.addEventListener("click", onclick, false);
+      canvas.addEventListener("click", onClick, false);
     }
   });
 
-  const resize = (): void => {
+  function resize(): void {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
 
@@ -87,9 +87,10 @@ const App = () => {
     if (isLoaded) {
       drawImage();
     }
-  };
+  }
 
-  const drawImage = (): void => {
+  // 이미지를 캔버스에 그리는 함수
+  function drawImage(): void {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
 
@@ -134,9 +135,9 @@ const App = () => {
     );
 
     drawDots();
-  };
+  }
 
-  const drawDots = (): void => {
+  function drawDots(): void {
     dots = [];
 
     const stageWidth: number = document.body.clientWidth;
@@ -165,9 +166,9 @@ const App = () => {
         dots.push(dot);
       }
     }
-  };
+  }
 
-  const animate = (): void => {
+  function animate(): void {
     window.requestAnimationFrame(animate);
 
     ripple.animate(ctx);
@@ -179,9 +180,9 @@ const App = () => {
         dot.animate(ctx);
       }
     }
-  };
+  }
 
-  const onclick = (event: MouseEvent): void => {
+  function onClick(event: MouseEvent): void {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
 
@@ -204,7 +205,7 @@ const App = () => {
     );
 
     ripple.start(event.offsetX, event.offsetY);
-  };
+  }
   return (
     <>
       <GlobalStyle />
