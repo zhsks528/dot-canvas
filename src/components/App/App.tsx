@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import paint from "resources/images/paint.png";
-import { Ripple } from "components/Ripple/Ripple";
-import { Dot } from "components/Dot/dot";
+import { Ripple } from "components/ripple";
+import { Dot } from "components/dot";
 import { collide } from "utils";
 import styled from "styled-components";
 import GlobalStyle from "components/globalStyle";
