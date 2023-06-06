@@ -45,29 +45,6 @@ const App = () => {
 
   const ripple = new Ripple();
 
-  useEffect(() => {
-    if (canvasRef.current && tmpCanvasRef.current) {
-      canvas = canvasRef.current;
-      ctx = canvasRef.current.getContext("2d");
-
-      tmpCanvas = tmpCanvasRef.current;
-      tmpCtx = tmpCanvasRef.current.getContext("2d");
-
-      window.addEventListener("resize", resize, false);
-
-      resize();
-
-      image.onload = () => {
-        setIsLoaded(true);
-        drawImage();
-      };
-
-      window.requestAnimationFrame(animate);
-
-      canvas.addEventListener("click", onClick, false);
-    }
-  });
-
   function resize(): void {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
@@ -89,7 +66,6 @@ const App = () => {
     }
   }
 
-  // 이미지를 캔버스에 그리는 함수
   function drawImage(): void {
     const stageWidth: number = document.body.clientWidth;
     const stageHeight: number = document.body.clientHeight;
@@ -206,6 +182,30 @@ const App = () => {
 
     ripple.start(event.offsetX, event.offsetY);
   }
+
+  useEffect(() => {
+    if (canvasRef.current && tmpCanvasRef.current) {
+      canvas = canvasRef.current;
+      ctx = canvasRef.current.getContext("2d");
+
+      tmpCanvas = tmpCanvasRef.current;
+      tmpCtx = tmpCanvasRef.current.getContext("2d");
+
+      window.addEventListener("resize", resize, false);
+
+      resize();
+
+      image.onload = () => {
+        setIsLoaded(true);
+        drawImage();
+      };
+
+      window.requestAnimationFrame(animate);
+
+      canvas.addEventListener("click", onClick, false);
+    }
+  });
+
   return (
     <>
       <GlobalStyle />
