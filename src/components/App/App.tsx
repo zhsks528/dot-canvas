@@ -92,7 +92,7 @@ const App = () => {
     drawDots();
   }, [image, imgPos]);
 
-  function drawDots(): void {
+  const drawDots = () => {
     dots = [];
 
     const stageWidth: number = document.body.clientWidth;
@@ -121,21 +121,7 @@ const App = () => {
         dots.push(dot);
       }
     }
-  }
-
-  const animate = useCallback(() => {
-    window.requestAnimationFrame(animate);
-
-    ripple.animate(ctx);
-
-    for (let i = 0; i < dots.length; i++) {
-      const dot = dots[i];
-
-      if (collide(dot.x, dot.y, ripple.x, ripple.y, ripple.radius)) {
-        dot.animate(ctx);
-      }
-    }
-  }, [ripple]);
+  };
 
   const onClick = useCallback(
     (event: MouseEvent): void => {
@@ -187,6 +173,20 @@ const App = () => {
   }, [isLoaded, pixelRatio, ripple, drawImage]);
 
   useEffect(() => {
+    const animate = () => {
+      window.requestAnimationFrame(animate);
+
+      ripple.animate(ctx);
+
+      for (let i = 0; i < dots.length; i++) {
+        const dot = dots[i];
+
+        if (collide(dot.x, dot.y, ripple.x, ripple.y, ripple.radius)) {
+          dot.animate(ctx);
+        }
+      }
+    };
+
     if (canvasRef.current && tmpCanvasRef.current) {
       canvas = canvasRef.current;
       ctx = canvasRef.current.getContext("2d");
@@ -211,10 +211,7 @@ const App = () => {
         canvas.removeEventListener("click", onClick, false);
       };
     }
-  }, [image, animate, drawImage, onClick, resize]);
-
-  console.log("ctx", ctx);
-  console.log("imgPos", imgPos);
+  }, [image, ripple, drawImage, onClick, resize]);
 
   return (
     <>
